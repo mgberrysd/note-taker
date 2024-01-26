@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-// const api = require('./public/assets/js/index');
 const { v4: uuidv4 } = require('uuid');
 const {
     readFromFile,
@@ -15,7 +14,6 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use('/api', api);
 
 app.use(express.static('public'));
 
@@ -36,7 +34,7 @@ app.post('/api/notes', (req, res) => {
         const newTask = {
             title,
             text,
-            task_id: uuidv4(),
+            id: uuidv4(),
         };
 
         readAndAppend(newTask, './db/db.json');
@@ -45,6 +43,22 @@ app.post('/api/notes', (req, res) => {
         res.error('Error in adding task');
     }
 });
+
+app.delete('/api/notes/:id', (req, res) => {
+    const taskId = req.params.id;
+    readFromFile('./db/db.json')
+      .then((data) => JSON.parse(data))
+      .then((json) => {
+        // Make a new array of all tips except the one with the ID provided in the URL
+        const result = json.filter((task) => task.id !== taskId);
+  
+        // Save that array to the filesystem
+        writeToFile('./db/db.json', result);
+  
+        // Respond to the DELETE request
+        res.json(`Item ${taskId} has been deleted 🗑️`);
+      });
+  });
 
 app.get('/*', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/index.html'))
