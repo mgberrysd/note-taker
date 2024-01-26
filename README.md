@@ -10,7 +10,7 @@ This project highlighted the use of the Express package to write server code usi
 
 The repo of the project can be found at https://github.com/mgberrysd/note-taker
 
-A live version of the site can be found at
+A live version of the site can be found at https://murmuring-taiga-11356-55271fef0ba0.herokuapp.com/
 
 When on the notes page the user should see the following:
 
