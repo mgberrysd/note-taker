@@ -23,13 +23,19 @@ app.get('/notes', (req, res) =>
 
 app.get('/api/notes', (req, res) => {
     // readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)));
-    fs.readFile('./db/db.json', 'utf8', (err, data) => {res.json(JSON.parse(data))});
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            res.json(JSON.parse(data));
+        }
+    });
 });
 
 app.post('/api/notes', (req, res) => {
     console.log(req.body);
 
-    const { title, text} = req.body;
+    const {title, text} = req.body;
 
     if (req.body) {
         const newTask = {
@@ -38,7 +44,19 @@ app.post('/api/notes', (req, res) => {
             id: uuidv4(),
         };
 
-        readAndAppend(newTask, './db/db.json');
+        // readAndAppend(newTask, './db/db.json');
+
+        fs.readFile('./db/db.json', 'utf8', (err, data) => {
+            if (err) {
+              console.error(err);
+            } else {
+              const parsedData = JSON.parse(data);
+              parsedData.push(newTask);
+            //   writeToFile(file, parsedData);
+            fs.writeFile('./db/db.json', JSON.stringify(parsedData, null, 4), (err) =>
+            err ? console.error(err) : console.info(`\nData written to ./db/db.json`))
+            }
+          });
         res.json(`Task added successfully`);
     } else {
         res.error('Error in adding task');
