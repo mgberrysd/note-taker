@@ -6,7 +6,7 @@ const {
     readFromFile,
     readAndAppend,
     writeToFile,
-  } = require('./helpers/fsUtils');
+} = require('./helpers/fsUtils');
 
 const PORT = process.env.PORT || 3001;
 
@@ -35,7 +35,7 @@ app.get('/api/notes', (req, res) => {
 app.post('/api/notes', (req, res) => {
     console.log(req.body);
 
-    const {title, text} = req.body;
+    const { title, text } = req.body;
 
     if (req.body) {
         const newTask = {
@@ -48,15 +48,15 @@ app.post('/api/notes', (req, res) => {
 
         fs.readFile('./db/db.json', 'utf8', (err, data) => {
             if (err) {
-              console.error(err);
+                console.error(err);
             } else {
-              const parsedData = JSON.parse(data);
-              parsedData.push(newTask);
-            //   writeToFile(file, parsedData);
-            fs.writeFile('./db/db.json', JSON.stringify(parsedData, null, 4), (err) =>
-            err ? console.error(err) : console.info(`\nData written to ./db/db.json`))
+                const parsedData = JSON.parse(data);
+                parsedData.push(newTask);
+                //   writeToFile(file, parsedData);
+                fs.writeFile('./db/db.json', JSON.stringify(parsedData, null, 4), (err) =>
+                    err ? console.error(err) : console.info(`\nData written to ./db/db.json`))
             }
-          });
+        });
         res.json(`Task added successfully`);
     } else {
         res.error('Error in adding task');
@@ -65,19 +65,38 @@ app.post('/api/notes', (req, res) => {
 
 app.delete('/api/notes/:id', (req, res) => {
     const taskId = req.params.id;
-    readFromFile('./db/db.json')
-      .then((data) => JSON.parse(data))
-      .then((json) => {
-        // Make a new array of all tips except the one with the ID provided in the URL
-        const result = json.filter((task) => task.id !== taskId);
-  
-        // Save that array to the filesystem
-        writeToFile('./db/db.json', result);
-  
-        // Respond to the DELETE request
-        res.json(`Item ${taskId} has been deleted 🗑️`);
-      });
-  });
+    // readFromFile('./db/db.json')
+    //   .then((data) => JSON.parse(data))
+    //   .then((json) => {
+    //     // Make a new array of all tips except the one with the ID provided in the URL
+    //     const result = json.filter((task) => task.id !== taskId);
+
+    //     // Save that array to the filesystem
+    //     writeToFile('./db/db.json', result);
+
+    //     // Respond to the DELETE request
+    //     res.json(`Item ${taskId} has been deleted 🗑️`);
+    //   });
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+        }
+        else {
+            const json = JSON.parse(data);
+            const result = json.filter((task) => task.id !== taskId);
+            fs.writeFile('./db/db.json', JSON.stringify(result, null, 4), (err) =>
+                err ? console.error(err) : console.info(`\nData written to ./db/db.json`))
+            res.json(`Item ${taskId} has been deleted 🗑️`);
+        }
+    });
+
+
+});
+
+
+
+
+
 
 app.get('/*', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/index.html'))
