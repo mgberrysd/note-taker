@@ -22,7 +22,8 @@ app.get('/notes', (req, res) =>
 );
 
 app.get('/api/notes', (req, res) => {
-    readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)));
+    // readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)));
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {res.json(JSON.parse(data))});
 });
 
 app.post('/api/notes', (req, res) => {
